@@ -31,6 +31,16 @@ class MakaleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Yayinlanma tarihi ileri bir tarih olamaz!')
         return tarihdegeri
 
+class GazeteciSerializer(serializers.ModelSerializer):
+    makaleler = serializers.HyperlinkedRelatedField(
+        many = True,
+        read_only = True,
+        view_name= 'makale-detay',
+    )
+
+    class Meta:
+        model = Gazeteci
+        fields ='__all__'
 
 
 
