@@ -1,55 +1,54 @@
-from django.db.models import fields
 from rest_framework import serializers
-from haber import models
 from haber.models import Makale, Gazeteci
+
 
 from datetime import datetime
 from datetime import date
 from django.utils.timesince import timesince
 
 
+
 class MakaleSerializer(serializers.ModelSerializer):
+
     time_since_pub = serializers.SerializerMethodField()
+    # yazar = serializers.StringRelatedField()
 
     class Meta:
         model = Makale
         fields = '__all__'
-        read_only_fields = ['id','yaratilma_tarihi','guncelleme_tarihi']
+        # fields = ['yazar', 'baslik', 'metin']
+        # exclude = ['yazar', 'baslik', 'metin']
+        read_only_fields = ['id', 'yaratilma_tarihi', 'güncelleneme_tarihi']
 
     def get_time_since_pub(self,object):
         now = datetime.now()
-        pub_date = object.yayinlanma_tarihi
+        pub_date = object.yayımlanma_tarihi
         if object.aktif == True:
-            time_delta = timesince(pub_date,now)
+            time_delta = timesince(pub_date, now)
             return time_delta
         else:
-            return 'Aktif degil!'
-    
-    def validate_yayinlanma_tarihi(self,tarihdegeri):
+            return 'Aktif Degil!'
+
+    def validate_yayımlanma_tarihi(self, tarihdegeri):
         today = date.today()
         if tarihdegeri > today:
-            raise serializers.ValidationError('Yayinlanma tarihi ileri bir tarih olamaz!')
+            raise serializers.ValidationError('Yayımlanma tarihi ileri bir tarih olamaz!')
         return tarihdegeri
 
+
+
 class GazeteciSerializer(serializers.ModelSerializer):
+
+    # makaleler = MakaleSerializer(many=True, read_only=True)
     makaleler = serializers.HyperlinkedRelatedField(
-        many = True,
-        read_only = True,
-        view_name= 'makale-detay',
+        many=True,
+        read_only=True,
+        view_name='makale-detay',
     )
 
     class Meta:
         model = Gazeteci
-        fields ='__all__'
-
-
-
-
-
-
-
-
-
+        fields = '__all__'
 
 
 
